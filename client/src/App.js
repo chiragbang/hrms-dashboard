@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const isAuthenticated = localStorage.getItem('token');
@@ -25,6 +26,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         
         {/* Protected Route */}
         <Route
