@@ -1,5 +1,7 @@
 "use client"
 import React, { useEffect } from 'react';
+import 'antd/dist/reset.css'; // For Ant Design v5
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import LoginPage from './pages/LoginPage';

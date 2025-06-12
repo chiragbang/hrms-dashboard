@@ -1,57 +1,120 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Form, Input, Button, Typography } from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../styles/RegisterPage.css'; // reused layout
+
+const { Title, Text } = Typography;
 
 const LoginPage = () => {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [formInstance] = Form.useForm();
+  const navigate = useNavigate();
 
-  // Handle Input
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  // Submit Login
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  const onFinish = async (values) => {
+    setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
+      const res = await axios.post('http://localhost:5000/api/auth/login', values);
+
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       localStorage.setItem('loginTime', new Date().toISOString());
 
-      setMessage('Login successful!');
-      window.location.href = '/dashboard'; // redirect
+      setSnackbar({ open: true, message: 'Login successful!', severity: 'success' });
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } catch (err) {
-      setError(err.response?.data?.msg || 'Something went wrong');
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.msg || 'Invalid credentials',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>HR Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        /><br /><br />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        /><br /><br />
-        <button type="submit">Login</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {message && <p style={{ color: 'green' }}>{message}</p>}
+    <div className="register-wrapper">
+      <div className="register-card">
+        <div className="register-left">
+          <img src="/dashboard.png" alt="Dashboard" className="dashboard-img" />
+          <div className="left-text">
+            <h3>Lorem ipsum dolor sit amet</h3>
+            <p>
+              Tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+              quis nostrud exercitation ullamco laboris nisi ut aliquip.
+            </p>
+            <div className="carousel-dots">
+              <span className="dot active" />
+              <span className="dot" />
+              <span className="dot" />
+            </div>
+          </div>
+        </div>
+
+        <div className="register-right">
+          <img src="/logo.jpeg" alt="Logo" className="register-logo" />
+          <Title level={3}>Login to Dashboard</Title>
+
+          <Form layout="vertical" onFinish={onFinish} form={formInstance}>
+            <Form.Item
+              label="Email Address"
+              name="email"
+              rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
+            >
+              <Input placeholder="Email Address" />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[{ required: true, message: 'Please enter your password' }]}
+            >
+              <Input.Password
+                placeholder="Password"
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+                style={{ backgroundColor: '#4b0082' }}
+              >
+                Login
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <Text type="secondary">
+            Don’t have an account? <a href="/register">Register</a>
+          </Text>
+        </div>
+      </div>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={snackbar.severity} onClose={handleSnackbarClose} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

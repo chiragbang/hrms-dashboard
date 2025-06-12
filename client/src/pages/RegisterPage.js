@@ -1,94 +1,161 @@
 import React, { useState } from 'react';
-import '../styles/RegisterPage.css'; // Import the CSS file
-// import logo from '../assets/logo.png'; 
-// import sideImage from '../assets/side-image.jpg'; 
+import { Form, Input, Button, Typography } from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../styles/RegisterPage.css';
+
+const { Title, Text } = Typography;
 
 const RegisterPage = () => {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
   });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const [formInstance] = Form.useForm();
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+  const onFinish = async (values) => {
+    const { name, email, password, confirmPassword } = values;
 
-    if (form.password !== form.confirmPassword) {
-      return setError('Passwords do not match');
+    if (password !== confirmPassword) {
+      return setSnackbar({
+        open: true,
+        message: 'Passwords do not match',
+        severity: 'error',
+      });
     }
 
     try {
-      const { name, email, password } = form;
+      setLoading(true);
       const res = await axios.post('http://localhost:5000/api/auth/register', {
         name,
         email,
         password,
       });
-      setMessage(res.data.msg || 'Registered successfully');
-      setForm({ name: '', email: '', password: '', confirmPassword: '' });
+
+      setSnackbar({
+        open: true,
+        message: res.data.msg || 'Registration successful',
+        severity: 'success',
+      });
+
+      formInstance.resetFields(); // ✅ Clear form
+      setTimeout(() => navigate('/'), 1500); // ✅ Navigate after delay
+
     } catch (err) {
-      setError(err.response?.data?.msg || 'Something went wrong');
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.msg || 'Something went wrong',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="register-container">
-      <div className="left-side">
-        <img src="/dashboard.png" alt="side" className="side-image" />
-      </div>
-      <div className="right-side">
-        <div className="form-wrapper">
-          <img src="/logo.jpg" alt="Logo" className="logo" />
-          <h2>HR Registration</h2>
-          <form onSubmit={handleSubmit}>
-            <input
+    <div className="register-wrapper">
+      <div className="register-card">
+        <div className="register-left">
+          <img src="/dashboard.png" alt="Dashboard" className="dashboard-img" />
+          <div className="left-text">
+            <h3>Lorem ipsum dolor sit amet</h3>
+            <p>
+              Tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+              quis nostrud exercitation ullamco laboris nisi ut aliquip.
+            </p>
+            <div className="carousel-dots">
+              <span className="dot active" />
+              <span className="dot" />
+              <span className="dot" />
+            </div>
+          </div>
+        </div>
+
+        <div className="register-right">
+          <img src="/logo.jpeg" alt="Logo" className="register-logo" />
+          <Title level={3}>Welcome to Dashboard</Title>
+
+          <Form
+            layout="vertical"
+            onFinish={onFinish}
+            form={formInstance}
+          >
+            <Form.Item
+              label="Full name"
               name="name"
-              type="text"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-            <input
+              rules={[{ required: true, message: 'Please enter your name' }]}
+            >
+              <Input placeholder="Full name" />
+            </Form.Item>
+
+            <Form.Item
+              label="Email Address"
               name="email"
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <input
+              rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
+            >
+              <Input placeholder="Email Address" />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
               name="password"
-              type="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            <input
+              rules={[{ required: true, message: 'Please enter your password' }]}
+            >
+              <Input.Password
+                placeholder="Password"
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Confirm Password"
               name="confirmPassword"
-              type="password"
-              placeholder="Confirm Password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-            <button type="submit">Register</button>
-          </form>
-          {error && <p className="error">{error}</p>}
-          {message && <p className="message">{message}</p>}
+              rules={[{ required: true, message: 'Please confirm your password' }]}
+            >
+              <Input.Password
+                placeholder="Confirm Password"
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+                style={{ backgroundColor: '#4b0082' }}
+              >
+                Register
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <Text type="secondary">
+            Already have an account? <a href="/">Login</a>
+          </Text>
         </div>
       </div>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={snackbar.severity} onClose={handleSnackbarClose} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
