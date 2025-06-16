@@ -4,9 +4,16 @@ const candidateSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
+  position: String,
+  experience: String,
+  location: String,
   skills: [String],
-  resume: String, // path to PDF file
-  status: { type: String, default: 'candidate' }, // or 'employee'
+  resume: String,
+  status: {
+    type: String,
+    enum: ['New', 'Scheduled', 'Ongoing', 'Selected', 'Rejected'],
+    default: 'New',
+  },
 });
 
 module.exports = mongoose.model('Candidate', candidateSchema);
