@@ -1,0 +1,54 @@
+.add-candidate-container {
+  padding: 2rem;
+}
+
+.add-candidate-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-candidate-search {
+  width: 300px;
+}
+
+.add-candidate-button {
+  background-color: #4b0082 !important;
+  border-color: #4b0082 !important;
+  color: #fff !important;
+}
+
+.add-candidate-table {
+  margin-top: 2rem;
+}
+
+/* Table header style */
+.add-candidate-table .ant-table-thead > tr > th {
+  background-color: #4b0082 !important;
+  color: white !important;
+}
+
+.status-select-wrapper .ant-select-selector {
+  font-weight: bold;
+}
+
+/* Status color styles */
+.status-new .ant-select-selector {
+  color: black !important;
+}
+
+.status-scheduled .ant-select-selector {
+  color: orange !important;
+}
+
+.status-ongoing .ant-select-selector {
+  color: green !important;
+}
+
+.status-selected .ant-select-selector {
+  color: indigo !important;
+}
+
+.status-rejected .ant-select-selector {
+  color: red !important;
+}

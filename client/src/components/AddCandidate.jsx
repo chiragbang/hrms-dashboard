@@ -11,6 +11,7 @@ import {
 } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import '../styles/AddCandidate.css'; // ✅ Import global CSS
 
 const { Option } = Select;
 const statusOptions = ['New', 'Scheduled', 'Ongoing', 'Selected', 'Rejected'];
@@ -73,36 +74,12 @@ const AddCandidate = () => {
   };
 
   const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: 'Position',
-      dataIndex: 'position',
-      key: 'position',
-    },
-    {
-      title: 'Experience',
-      dataIndex: 'experience',
-      key: 'experience',
-    },
-    {
-      title: 'Location',
-      dataIndex: 'location',
-      key: 'location',
-    },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'Email', dataIndex: 'email', key: 'email' },
+    { title: 'Phone', dataIndex: 'phone', key: 'phone' },
+    { title: 'Position', dataIndex: 'position', key: 'position' },
+    { title: 'Experience', dataIndex: 'experience', key: 'experience' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
     {
       title: 'Skills',
       dataIndex: 'skills',
@@ -119,36 +96,44 @@ const AddCandidate = () => {
         </a>
       ),
     },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text, record) => (
-        <Select
-          value={text}
-          style={{ width: 130 }}
-          onChange={(value) => handleStatusChange(record._id, value)}
-        >
-          {statusOptions.map((s) => (
-            <Option key={s} value={s}>
-              {s}
-            </Option>
-          ))}
-        </Select>
-      ),
-    },
+   {
+  title: 'Status',
+  dataIndex: 'status',
+  key: 'status',
+  render: (text, record) => (
+    <div className={`status-select-wrapper status-${text.toLowerCase()}`}>
+      <Select
+        value={text}
+        style={{ width: 130 }}
+        onChange={(value) => handleStatusChange(record._id, value)}
+      >
+        {statusOptions.map((s) => (
+          <Option key={s} value={s}>
+            {s}
+          </Option>
+        ))}
+      </Select>
+    </div>
+  ),
+}
+
   ];
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className="add-candidate-container">
+      <div className="add-candidate-topbar">
         <Input
           placeholder="Search candidates..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ width: '300px' }}
+          className="add-candidate-search"
         />
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+        <Button
+          className="add-candidate-button"
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setIsModalOpen(true)}
+        >
           Add Candidate
         </Button>
       </div>
@@ -157,7 +142,7 @@ const AddCandidate = () => {
         columns={columns}
         dataSource={candidates}
         rowKey="_id"
-        style={{ marginTop: '2rem' }}
+        className="add-candidate-table"
         pagination={{ pageSize: 5 }}
       />
 
@@ -209,7 +194,12 @@ const AddCandidate = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button
+              className="add-candidate-button"
+              type="primary"
+              htmlType="submit"
+              block
+            >
               Add Candidate
             </Button>
           </Form.Item>
