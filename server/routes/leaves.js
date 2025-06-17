@@ -4,7 +4,7 @@ const Leave = require('../models/Leave');
 const Attendance = require('../models/Attendance');
 const Employee = require('../models/Employee');
 
-// Add leave for an employee (by HR/Admin)
+
 router.post('/', async (req, res) => {
   try {
     const { employeeId, fromDate, toDate, reason } = req.body;
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all leaves
+
 router.get('/', async (req, res) => {
   try {
     const { search, date } = req.query;
@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Update leave status
+
 router.put('/:id', async (req, res) => {
   try {
     const { status } = req.body;

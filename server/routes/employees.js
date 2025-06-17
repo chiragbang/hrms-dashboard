@@ -2,10 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Employee = require('../models/Employee');
 
-/**
- * @route   GET /api/employees
- * @desc    Get all employees (with optional search)
- */
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
@@ -33,10 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 
-/**
- * @route   PUT /api/employees/:id
- * @desc    Update employee details
- */
+
 router.put('/:id', async (req, res) => {
   try {
     const { name, email, phone, department, position, dateOfJoining } = req.body;
@@ -65,10 +58,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-/**
- * @route   DELETE /api/employees/:id
- * @desc    Delete an employee
- */
+
+ 
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Employee.findByIdAndDelete(req.params.id);

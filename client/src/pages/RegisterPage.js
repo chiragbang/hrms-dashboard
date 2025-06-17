@@ -48,8 +48,8 @@ const RegisterPage = () => {
         severity: 'success',
       });
 
-      formInstance.resetFields(); // ✅ Clear form
-      setTimeout(() => navigate('/'), 1500); // ✅ Navigate after delay
+      formInstance.resetFields(); 
+      setTimeout(() => navigate('/'), 1500); 
 
     } catch (err) {
       setSnackbar({

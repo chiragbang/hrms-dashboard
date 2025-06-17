@@ -1,4 +1,4 @@
-// src/config/config.js
+
 const config = {
   endpoint: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
 };

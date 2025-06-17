@@ -1,7 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import '../styles/LayoutWrapper.css'; // optional
+import '../styles/LayoutWrapper.css'; 
 
 const LayoutWrapper = ({ children }) => {
   return (

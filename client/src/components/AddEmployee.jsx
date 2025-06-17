@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import config from '../config/config';
-import '../styles/AddCandidate.css'; // Reuse same styles
+import '../styles/AddCandidate.css'; 
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -79,7 +79,7 @@ const handleEdit = (record) => {
   setEditingId(record._id);
   setIsModalOpen(true);
 
-  // Ensure dateOfJoining is a dayjs object
+  
   const formattedRecord = {
     ...record,
     dateOfJoining: record.dateOfJoining ? dayjs(record.dateOfJoining) : null,

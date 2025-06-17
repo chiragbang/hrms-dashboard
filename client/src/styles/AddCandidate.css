@@ -22,7 +22,7 @@
   margin-top: 2rem;
 }
 
-/* Table header style */
+
 .add-candidate-table .ant-table-thead > tr > th {
   background-color: #4b0082 !important;
   color: white !important;
@@ -32,7 +32,7 @@
   font-weight: bold;
 }
 
-/* Status color styles */
+
 .status-new .ant-select-selector {
   color: black !important;
 }

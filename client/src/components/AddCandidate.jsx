@@ -88,7 +88,7 @@ const AddCandidate = () => {
       setIsModalOpen(false);
       fetchCandidates();
     } catch (err) {
-      // Validation failed; do nothing
+    
     }
   };
 

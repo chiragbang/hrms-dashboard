@@ -6,7 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Setup storage for resumes
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/resumes/');
@@ -18,10 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/**
- * @route   POST /api/candidates
- * @desc    Add a new candidate
- */
+
 router.post('/', upload.single('resume'), async (req, res) => {
   try {
     const { name, email, phone, skills, position, experience, location } = req.body;
@@ -45,10 +42,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
   }
 });
 
-/**
- * @route   GET /api/candidates
- * @desc    Get all candidates (optional search), sorted by updatedAt desc
- */
+
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
@@ -75,10 +69,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * @route   PUT /api/candidates/status/:id
- * @desc    Update candidate status and promote to employee if "Selected"
- */
 router.put('/status/:id', async (req, res) => {
   try {
     const { status } = req.body;
@@ -98,7 +88,7 @@ router.put('/status/:id', async (req, res) => {
       return res.status(404).json({ msg: 'Candidate not found' });
     }
 
-    // 👇 Promote to employee if status is "Selected"
+    
     if (status === 'Selected') {
       const exists = await Employee.findOne({ email: candidate.email });
 
@@ -107,8 +97,8 @@ router.put('/status/:id', async (req, res) => {
           name: candidate.name,
           email: candidate.email,
           phone: candidate.phone,
-          department: candidate.position, // Position in candidate becomes department
-          position: 'Full Time', // Default position (can update later)
+          department: candidate.position, 
+          position: 'Full Time', 
           dateOfJoining: new Date(),
           resume: candidate.resume,
           skills: candidate.skills
@@ -125,10 +115,7 @@ router.put('/status/:id', async (req, res) => {
   }
 });
 
-/**
- * @route   DELETE /api/candidates/:id
- * @desc    Delete a candidate and resume
- */
+
 router.delete('/:id', async (req, res) => {
   try {
     const candidate = await Candidate.findByIdAndDelete(req.params.id);

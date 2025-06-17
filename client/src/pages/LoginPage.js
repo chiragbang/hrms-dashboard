@@ -4,7 +4,7 @@ import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/RegisterPage.css'; // reused layout
+import '../styles/RegisterPage.css'; 
 import config from '../config/config';
 
 const { Title, Text } = Typography;

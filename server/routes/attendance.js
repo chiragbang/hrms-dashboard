@@ -3,14 +3,14 @@ const router = express.Router();
 const Attendance = require('../models/Attendance');
 const Employee = require('../models/Employee');
 
-// Helper to normalize date (00:00:00 time)
+
 const normalizeDate = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 };
 
-// GET attendance with optional filters
+
 router.get('/', async (req, res) => {
   try {
     const { search, date } = req.query;
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
     }
 
     if (date) {
-      filter.date = normalizeDate(date); // 👈 Fix exact date match
+      filter.date = normalizeDate(date); 
     }
 
     const records = await Attendance.find(filter).populate('employeeId');
@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST mark/update attendance
+
 router.post('/', async (req, res) => {
   try {
     const { employeeId, date, status } = req.body;

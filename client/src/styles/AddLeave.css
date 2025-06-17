@@ -19,7 +19,7 @@
   min-width: 280px;
 }
 
-/* Calendar */
+
 .calendar-container {
   border: 1px solid #e0e0e0;
   padding: 1rem;
@@ -27,7 +27,7 @@
   background: #fff;
 }
 
-/* Approved Leaves Box */
+
 .approved-leaves {
   border: 1px solid #e0e0e0;
   padding: 1rem;
@@ -46,7 +46,7 @@
   font-size: 14px;
 }
 
-/* Add Leave Button */
+
 .add-leave-btn {
   background-color: #4b0082 !important;
   border-color: #4b0082 !important;
@@ -54,14 +54,14 @@
   font-weight: 500;
 }
 
-/* Table Header */
+
 .ant-table-thead > tr > th {
   background-color: #4b0082 !important;
   color: white !important;
   font-weight: 600;
 }
 
-/* Table Pagination */
+
 .ant-pagination-item-active {
   border-color: #4b0082;
 }
@@ -70,13 +70,13 @@
   color: #4b0082 !important;
 }
 
-/* Modal Heading */
+
 .ant-modal-title {
   color: #4b0082;
   font-weight: 600;
 }
 
-/* Leave Status Tag Colors */
+
 .ant-tag-orange {
   background-color: #fff7e6;
   color: orange;
@@ -95,18 +95,17 @@
   border-color: red;
 }
 
-/* Select Status Dropdown */
+
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   font-weight: 500;
 }
 
-/* Optional enhancements for hover/focus */
 .add-leave-btn:hover {
   background-color: #5c1a9d !important;
   border-color: #5c1a9d !important;
 }
 
-/* Modal Form Label */
+
 .ant-form-item-label > label {
   font-weight: 500;
   color: #4b0082;
