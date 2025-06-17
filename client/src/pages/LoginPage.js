@@ -32,7 +32,7 @@ const LoginPage = () => {
 
       setTimeout(() => {
         navigate('/candidates');
-      }, 1000);
+      });
     } catch (err) {
       setSnackbar({
         open: true,
