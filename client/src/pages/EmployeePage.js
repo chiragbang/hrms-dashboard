@@ -1,7 +1,7 @@
 import React from 'react'
 import AddEmployee from '../components/AddEmployee'
 
-const EmployePage = () => {
+const EmployeePage = () => {
   return (
     <div>
         <AddEmployee/>
@@ -9,4 +9,4 @@ const EmployePage = () => {
   )
 }
 
-export default EmployePage
+export default EmployeePage

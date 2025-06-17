@@ -15,8 +15,10 @@ import Header from './components/Header';
 import { ActiveTabProvider } from './context/ActiveTabContext';
 
 import './App.css'; // Optional: general layout CSS
-import LayoutWrapper from './components/LayoutWrapper';
 import DashboardLayout from './components/DashboardLayout';
+import EmployeePage from './pages/EmployeePage';
+import AttendancePage from './pages/AttendancePage';
+import LeavePage from './pages/LeavePage';
 
 function App() {
   const isAuthenticated = localStorage.getItem('token');
@@ -46,8 +48,7 @@ function App() {
             path="/dashboard"
             element={
               isAuthenticated ? (
-                  <DashboardLayout>
-
+                <DashboardLayout>
                   <Dashboard />
                 </DashboardLayout>
               ) : (
@@ -55,16 +56,53 @@ function App() {
               )
             }
           />
+
           <Route
             path="/candidates"
             element={
               isAuthenticated ? (
-                // <LayoutWrapper>
                 <DashboardLayout>
-
                   <CandidatePage />
                 </DashboardLayout>
-                // </LayoutWrapper>
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/employees"
+            element={
+              isAuthenticated ? (
+                <DashboardLayout>
+                  <EmployeePage />
+                </DashboardLayout>
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+             <Route
+            path="/attendance"
+            element={
+              isAuthenticated ? (
+                <DashboardLayout>
+                  <AttendancePage />
+                </DashboardLayout>
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+           <Route
+            path="/leaves"
+            element={
+              isAuthenticated ? (
+                <DashboardLayout>
+                  <LeavePage />
+                </DashboardLayout>
               ) : (
                 <Navigate to="/" />
               )

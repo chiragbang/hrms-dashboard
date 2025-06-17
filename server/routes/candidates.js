@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Candidate = require('../models/Candidate');
+const Employee = require('../models/Employee'); // 👈 import employee model
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 // Setup storage for resumes
 const storage = multer.diskStorage({
@@ -16,10 +18,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Add new candidate
+/**
+ * @route   POST /api/candidates
+ * @desc    Add a new candidate
+ */
 router.post('/', upload.single('resume'), async (req, res) => {
   try {
     const { name, email, phone, skills, position, experience, location } = req.body;
+
     const candidate = new Candidate({
       name,
       email,
@@ -27,19 +33,22 @@ router.post('/', upload.single('resume'), async (req, res) => {
       position,
       experience,
       location,
-      skills: skills.split(',').map(s => s.trim()), // clean whitespace
+      skills: skills.split(',').map(s => s.trim()),
       resume: req.file?.path || '',
-      status: 'New' // default, can omit this if defined in schema
     });
+
     await candidate.save();
-    res.status(201).json({ msg: 'Candidate added', candidate });
+    res.status(201).json({ msg: 'Candidate added successfully', candidate });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// Get all candidates (with optional search)
+/**
+ * @route   GET /api/candidates
+ * @desc    Get all candidates (optional search), sorted by updatedAt desc
+ */
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
@@ -58,7 +67,7 @@ router.get('/', async (req, res) => {
       };
     }
 
-    const candidates = await Candidate.find(filter);
+    const candidates = await Candidate.find(filter).sort({ updatedAt: -1 });
     res.json(candidates);
   } catch (err) {
     console.error(err);
@@ -66,21 +75,72 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Update candidate status (e.g., Scheduled, Ongoing, Selected, Rejected)
+/**
+ * @route   PUT /api/candidates/status/:id
+ * @desc    Update candidate status and promote to employee if "Selected"
+ */
 router.put('/status/:id', async (req, res) => {
   try {
     const { status } = req.body;
     const allowedStatuses = ['New', 'Scheduled', 'Ongoing', 'Selected', 'Rejected'];
+
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({ msg: 'Invalid status value' });
     }
 
-    const updated = await Candidate.findByIdAndUpdate(
+    const candidate = await Candidate.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
     );
-    res.json({ msg: `Status updated to ${status}`, updated });
+
+    if (!candidate) {
+      return res.status(404).json({ msg: 'Candidate not found' });
+    }
+
+    // 👇 Promote to employee if status is "Selected"
+    if (status === 'Selected') {
+      const exists = await Employee.findOne({ email: candidate.email });
+
+      if (!exists) {
+        const employee = new Employee({
+          name: candidate.name,
+          email: candidate.email,
+          phone: candidate.phone,
+          department: candidate.position, // Position in candidate becomes department
+          position: 'Full Time', // Default position (can update later)
+          dateOfJoining: new Date(),
+          resume: candidate.resume,
+          skills: candidate.skills
+        });
+
+        await employee.save();
+      }
+    }
+
+    res.json({ msg: `Status updated to ${status}`, updated: candidate });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+/**
+ * @route   DELETE /api/candidates/:id
+ * @desc    Delete a candidate and resume
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const candidate = await Candidate.findByIdAndDelete(req.params.id);
+    if (!candidate) {
+      return res.status(404).json({ msg: 'Candidate not found' });
+    }
+
+    if (candidate.resume && fs.existsSync(candidate.resume)) {
+      fs.unlinkSync(candidate.resume);
+    }
+
+    res.json({ msg: 'Candidate deleted successfully', candidate });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });

@@ -5,6 +5,7 @@ import { Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/RegisterPage.css'; // reused layout
+import config from '../config/config';
 
 const { Title, Text } = Typography;
 
@@ -21,7 +22,7 @@ const LoginPage = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', values);
+      const res = await axios.post(`${config.endpoint}/auth/login`, values);
 
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -30,7 +31,7 @@ const LoginPage = () => {
       setSnackbar({ open: true, message: 'Login successful!', severity: 'success' });
 
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/candidates');
       }, 1000);
     } catch (err) {
       setSnackbar({

@@ -8,26 +8,38 @@ import {
   Table,
   Modal,
   message,
+  Dropdown,
+  Menu,
+  Popconfirm,
+  Row,
+  Col,
 } from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  UploadOutlined,
+  PlusOutlined,
+  EllipsisOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
-import '../styles/AddCandidate.css'; // ✅ Import global CSS
+import config from '../config/config';
+import '../styles/AddCandidate.css';
 
 const { Option } = Select;
 const statusOptions = ['New', 'Scheduled', 'Ongoing', 'Selected', 'Rejected'];
+const positionOptions = ['Designer', 'Developer', 'Human Resource'];
 
 const AddCandidate = () => {
-  const [candidates, setCandidates] = useState([]);
-  const [resumeFile, setResumeFile] = useState(null);
-  const [search, setSearch] = useState('');
   const [form] = Form.useForm();
+  const [resumeFile, setResumeFile] = useState(null);
+  const [candidates, setCandidates] = useState([]);
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [positionFilter, setPositionFilter] = useState('');
 
   const fetchCandidates = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/candidates?search=${search}`
-      );
+      const res = await axios.get(`${config.endpoint}/candidates?search=${search}`);
       setCandidates(res.data);
     } catch (err) {
       message.error('Error fetching candidates');
@@ -38,38 +50,65 @@ const AddCandidate = () => {
     fetchCandidates();
   }, [search]);
 
-  const handleSubmit = async (values) => {
-    if (!resumeFile) {
-      return message.warning('Please upload a resume');
+  useEffect(() => {
+    filterCandidates();
+  }, [candidates, statusFilter, positionFilter]);
+
+  const filterCandidates = () => {
+    let filtered = [...candidates];
+    if (statusFilter) {
+      filtered = filtered.filter((c) => c.status === statusFilter);
     }
+    if (positionFilter) {
+      filtered = filtered.filter((c) => c.position === positionFilter);
+    }
+    setFilteredCandidates(filtered);
+  };
 
-    const data = new FormData();
-    Object.entries(values).forEach(([key, value]) => {
-      data.append(key, value);
-    });
-    data.append('resume', resumeFile);
-
+  const handleSubmit = async () => {
     try {
-      await axios.post('http://localhost:5000/api/candidates', data);
+      const values = await form.validateFields();
+
+      if (!resumeFile) {
+        message.error('Please upload a resume');
+        return;
+      }
+
+      const data = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+      data.append('resume', resumeFile);
+
+      await axios.post(`${config.endpoint}/candidates`, data);
+
       message.success('Candidate added successfully');
       form.resetFields();
       setResumeFile(null);
       setIsModalOpen(false);
       fetchCandidates();
     } catch (err) {
-      message.error('Failed to add candidate');
+      // Validation failed; do nothing
     }
   };
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/candidates/status/${id}`, {
-        status: newStatus,
-      });
+      await axios.put(`${config.endpoint}/candidates/status/${id}`, { status: newStatus });
       message.success('Status updated');
       fetchCandidates();
     } catch (err) {
       message.error('Failed to update status');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${config.endpoint}/candidates/${id}`);
+      message.success('Candidate deleted successfully');
+      fetchCandidates();
+    } catch (err) {
+      message.error('Failed to delete candidate');
     }
   };
 
@@ -87,60 +126,121 @@ const AddCandidate = () => {
       render: (skills) => skills.join(', '),
     },
     {
-      title: 'Resume',
-      dataIndex: 'resume',
-      key: 'resume',
-      render: (resume) => (
-        <a href={`http://localhost:5000/${resume}`} target="_blank" rel="noreferrer">
-          Download
-        </a>
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record) => (
+        <div className={`status-select-wrapper status-${text.toLowerCase()}`}>
+          <Select
+            value={text}
+            style={{ width: 130 }}
+            onChange={(value) => handleStatusChange(record._id, value)}
+          >
+            {statusOptions.map((s) => (
+              <Option key={s} value={s}>
+                {s}
+              </Option>
+            ))}
+          </Select>
+        </div>
       ),
     },
-   {
-  title: 'Status',
-  dataIndex: 'status',
-  key: 'status',
-  render: (text, record) => (
-    <div className={`status-select-wrapper status-${text.toLowerCase()}`}>
-      <Select
-        value={text}
-        style={{ width: 130 }}
-        onChange={(value) => handleStatusChange(record._id, value)}
-      >
-        {statusOptions.map((s) => (
-          <Option key={s} value={s}>
-            {s}
-          </Option>
-        ))}
-      </Select>
-    </div>
-  ),
-}
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+            <Menu.Item key="download">
+              <a
+                href={`http://localhost:5000/${record.resume}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Download Resume
+              </a>
+            </Menu.Item>
+            <Menu.Item key="delete">
+              <Popconfirm
+                title="Are you sure you want to delete this candidate?"
+                onConfirm={() => handleDelete(record._id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <span style={{ color: 'red' }}>Delete Candidate</span>
+              </Popconfirm>
+            </Menu.Item>
+          </Menu>
+        );
 
+        return (
+          <Dropdown overlay={menu} trigger={['click']}>
+            <EllipsisOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
+          </Dropdown>
+        );
+      },
+    },
   ];
 
   return (
     <div className="add-candidate-container">
       <div className="add-candidate-topbar">
-        <Input
-          placeholder="Search candidates..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="add-candidate-search"
-        />
-        <Button
-          className="add-candidate-button"
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Add Candidate
-        </Button>
+        <Row gutter={[12, 12]} style={{ width: '100%' }}>
+          <Col xs={24} sm={8}>
+            <Input
+              placeholder="Search candidates..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="add-candidate-search"
+            />
+          </Col>
+          <Col xs={12} sm={6}>
+            <Select
+              allowClear
+              placeholder="Filter by Status"
+              style={{ width: '100%' }}
+              value={statusFilter || undefined}
+              onChange={(value) => setStatusFilter(value)}
+            >
+              {statusOptions.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Select
+              allowClear
+              placeholder="Filter by Position"
+              style={{ width: '100%' }}
+              value={positionFilter || undefined}
+              onChange={(value) => setPositionFilter(value)}
+            >
+              {positionOptions.map((pos) => (
+                <Option key={pos} value={pos}>
+                  {pos}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={4}>
+            <Button
+              className="add-candidate-button"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setIsModalOpen(true)}
+              block
+            >
+              Add
+            </Button>
+          </Col>
+        </Row>
       </div>
 
       <Table
         columns={columns}
-        dataSource={candidates}
+        dataSource={filteredCandidates}
         rowKey="_id"
         className="add-candidate-table"
         pagination={{ pageSize: 5 }}
@@ -156,26 +256,38 @@ const AddCandidate = () => {
         }}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+        <Form form={form} layout="vertical">
+          <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter name' }]}>
             <Input placeholder="Enter full name" />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
+
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}>
             <Input placeholder="Enter email" />
           </Form.Item>
-          <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
+
+          <Form.Item name="phone" label="Phone" rules={[{ required: true, message: 'Please enter phone number' }]}>
             <Input placeholder="Enter phone number" />
           </Form.Item>
-          <Form.Item name="position" label="Position" rules={[{ required: true }]}>
-            <Input placeholder="Enter position" />
+
+          <Form.Item name="position" label="Position" rules={[{ required: true, message: 'Please select position' }]}>
+            <Select placeholder="Select position">
+              {positionOptions.map((pos) => (
+                <Option key={pos} value={pos}>
+                  {pos}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item name="experience" label="Experience" rules={[{ required: true }]}>
+
+          <Form.Item name="experience" label="Experience" rules={[{ required: true, message: 'Please enter experience' }]}>
             <Input placeholder="Enter experience" />
           </Form.Item>
-          <Form.Item name="location" label="Location" rules={[{ required: true }]}>
+
+          <Form.Item name="location" label="Location" rules={[{ required: true, message: 'Please enter location' }]}>
             <Input placeholder="Enter location" />
           </Form.Item>
-          <Form.Item name="skills" label="Skills (comma separated)" rules={[{ required: true }]}>
+
+          <Form.Item name="skills" label="Skills (comma separated)" rules={[{ required: true, message: 'Please enter skills' }]}>
             <Input placeholder="e.g. React, Node, MongoDB" />
           </Form.Item>
 
@@ -197,8 +309,8 @@ const AddCandidate = () => {
             <Button
               className="add-candidate-button"
               type="primary"
-              htmlType="submit"
               block
+              onClick={handleSubmit}
             >
               Add Candidate
             </Button>

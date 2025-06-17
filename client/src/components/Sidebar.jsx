@@ -35,7 +35,7 @@ const Sidebar = () => {
         <p className="section-title">Organization</p>
         <div
           className={`sidebar-item ${activeTab === 'Employees' ? 'active' : ''}`}
-          onClick={() => handleNav('Employees', '/dashboard')}
+          onClick={() => handleNav('Employees', '/employees')}
         >
           <MdGroups />
           <span>Employees</span>

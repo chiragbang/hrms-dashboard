@@ -1,0 +1,60 @@
+/* Main container */
+.add-attendance-container {
+  padding: 2rem;
+}
+
+/* Top section: date + button */
+.add-attendance-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Date Picker Styling */
+.add-attendance-datepicker .ant-picker {
+  width: 200px;
+}
+
+/* Save button */
+.add-attendance-save-button {
+  background-color: #4b0082 !important;
+  border-color: #4b0082 !important;
+  color: white !important;
+}
+
+/* Table styling */
+.add-attendance-table {
+  margin-top: 1rem;
+}
+
+/* Table header style */
+.add-attendance-table .ant-table-thead > tr > th {
+  background-color: #4b0082 !important;
+  color: white !important;
+}
+
+/* Select style */
+.status-select {
+  width: 160px;
+  font-weight: 500;
+}
+
+/* Status color indicators */
+.status-present .ant-select-selector {
+  color: green !important;
+}
+
+.status-absent .ant-select-selector {
+  color: red !important;
+}
+
+.status-halfday .ant-select-selector {
+  color: orange !important;
+}
+
+.status-wfh .ant-select-selector {
+  color: #007acc !important;
+}

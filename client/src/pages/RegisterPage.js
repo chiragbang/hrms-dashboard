@@ -5,6 +5,7 @@ import { Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/RegisterPage.css';
+import config from '../config/config';
 
 const { Title, Text } = Typography;
 
@@ -35,7 +36,7 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:5000/api/auth/register', {
+      const res = await axios.post(`${config.endpoint}/auth/register`, {
         name,
         email,
         password,
