@@ -153,7 +153,7 @@ const AddCandidate = () => {
           <Menu>
             <Menu.Item key="download">
               <a
-                href={`http://localhost:5000/${record.resume}`}
+                href={`https://hrms-backend-hc30.onrender.com/${record.resume}`}
                 target="_blank"
                 rel="noreferrer"
               >

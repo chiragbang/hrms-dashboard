@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Candidate = require('../models/Candidate');
-const Employee = require('../models/Employee'); // 👈 import employee model
+const Employee = require('../models/Employee'); 
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
